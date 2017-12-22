@@ -33,6 +33,7 @@ public class GameStarter extends javax.swing.JFrame {
     private void initComponents() {
 
         startButton = new javax.swing.JButton();
+        titleLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -43,6 +44,10 @@ public class GameStarter extends javax.swing.JFrame {
             }
         });
 
+        titleLabel.setFont(new java.awt.Font("Monospaced", 0, 36)); // NOI18N
+        titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        titleLabel.setText("Type RACER ...");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -51,11 +56,17 @@ public class GameStarter extends javax.swing.JFrame {
                 .addContainerGap(145, Short.MAX_VALUE)
                 .addComponent(startButton)
                 .addGap(158, 158, 158))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(titleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(112, 112, 112)
+                .addContainerGap()
+                .addComponent(titleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(startButton)
                 .addContainerGap(169, Short.MAX_VALUE))
         );
@@ -86,5 +97,6 @@ private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton startButton;
+    private javax.swing.JLabel titleLabel;
     // End of variables declaration//GEN-END:variables
 }
