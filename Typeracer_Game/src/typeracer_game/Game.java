@@ -63,6 +63,8 @@ public class Game extends javax.swing.JFrame {
                     para = para + thisLine;
                     System.out.println(para);
                     paraTextPane.setText(para);
+                    paraTextPane.setForeground(Color.green);
+                    paraTextPane.setBackground(Color.black);
                     return;
                 }
             }
@@ -84,6 +86,7 @@ public class Game extends javax.swing.JFrame {
         currentInputTF = new javax.swing.JTextField();
         paraDisplayer = new javax.swing.JScrollPane();
         paraTextPane = new javax.swing.JTextPane();
+        speedLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -103,6 +106,8 @@ public class Game extends javax.swing.JFrame {
         paraTextPane.setEditable(false);
         paraDisplayer.setViewportView(paraTextPane);
 
+        speedLabel.setText("Current Speed (WPM) : 0");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -119,6 +124,10 @@ public class Game extends javax.swing.JFrame {
                         .addGap(42, 42, 42)
                         .addComponent(paraDisplayer, javax.swing.GroupLayout.PREFERRED_SIZE, 467, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(speedLabel)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -129,7 +138,9 @@ public class Game extends javax.swing.JFrame {
                 .addComponent(currentInputTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
                 .addComponent(finishButton)
-                .addGap(72, 72, 72))
+                .addGap(47, 47, 47)
+                .addComponent(speedLabel)
+                .addContainerGap())
         );
 
         pack();
@@ -146,12 +157,14 @@ public class Game extends javax.swing.JFrame {
 
         char ch = evt.getKeyChar();
         System.out.print(ch);
-        if (ch == KeyEvent.VK_SPACE) //Matches wor whenever you press space
+        if (ch == KeyEvent.VK_SPACE) //Matches word whenever you press space
         {
             space++;
             float itime = (int) System.currentTimeMillis();
             current_speed = space / ((float) (itime - start_time) / 1000f);
             System.out.printf("Curent_speed is: %.2f", current_speed);
+            speedLabel.setText("Current Speed (WPM) : " + Math.ceil(current_speed*60.0));
+            speedLabel.paintImmediately(speedLabel.getVisibleRect());
             users_word = currentInputTF.getText();
             users_word = users_word.trim();
             if (flag == 0) {
@@ -169,13 +182,13 @@ public class Game extends javax.swing.JFrame {
                     System.out.println("you are done");
                     float time = (end_time - start_time) / 1000f;
                     System.out.println("time is" + time + " " + space + " " + error_count);
-                    float speed = (float) space / time;
+                    float speed = (float) space / ( (float) time / 60);
                     Math.ceil(speed);
-                    System.out.println("speed in words per second: " + speed);
+                    System.out.println("speed in words per minute: " + speed);
                     float accuracy = (float) ((float) (space - error_count) / (float) space) * 100;
                     accuracy = (float) Math.ceil(accuracy);
                     System.out.println("accuracy is" + accuracy);
-                    JOptionPane.showMessageDialog(null, "your accuracy is:" + accuracy + "   " + "\nyour typing speed is:" + speed);
+                    JOptionPane.showMessageDialog(null, "your accuracy is:" + accuracy + "   " + "\nyour typing speed is: " + Math.ceil(speed) + " WPM");
                     this.setVisible(false);
                     GameStarter obj = new GameStarter();
                     obj.setVisible(true);
@@ -202,5 +215,6 @@ public class Game extends javax.swing.JFrame {
     private javax.swing.JButton finishButton;
     private javax.swing.JScrollPane paraDisplayer;
     private javax.swing.JTextPane paraTextPane;
+    private javax.swing.JLabel speedLabel;
     // End of variables declaration//GEN-END:variables
 }
