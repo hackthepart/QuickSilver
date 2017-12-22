@@ -26,6 +26,7 @@ public class Game extends javax.swing.JFrame {
     int end_time;
     String para = null;
     int space = 0, error_count = 0;
+    int character_count = 0, curr_error_count = 0,uncorr_error = 0;
     int count = 0, totalWords;
     StringTokenizer words;
     String correct_word = "";
@@ -71,6 +72,12 @@ public class Game extends javax.swing.JFrame {
         }
     }
 
+    private float wpmcalc(int typed_entries, int uncorrected_errors){
+        float time = (int) System.currentTimeMillis();
+        float wpm=((typed_entries/5)-uncorrected_errors)*60000/(time-start_time);
+        return(wpm);
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -84,6 +91,7 @@ public class Game extends javax.swing.JFrame {
         currentInputTF = new javax.swing.JTextField();
         paraDisplayer = new javax.swing.JScrollPane();
         paraTextPane = new javax.swing.JTextPane();
+        wpmLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -103,6 +111,8 @@ public class Game extends javax.swing.JFrame {
         paraTextPane.setEditable(false);
         paraDisplayer.setViewportView(paraTextPane);
 
+        wpmLabel.setText("WPM: 0.0 words");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -113,12 +123,16 @@ public class Game extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(currentInputTF, javax.swing.GroupLayout.DEFAULT_SIZE, 597, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(153, 153, 153)
-                        .addComponent(finishButton))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(42, 42, 42)
-                        .addComponent(paraDisplayer, javax.swing.GroupLayout.PREFERRED_SIZE, 467, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(paraDisplayer, javax.swing.GroupLayout.PREFERRED_SIZE, 467, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(finishButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(wpmLabel)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -128,7 +142,9 @@ public class Game extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(currentInputTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
-                .addComponent(finishButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(finishButton)
+                    .addComponent(wpmLabel))
                 .addGap(72, 72, 72))
         );
 
@@ -146,6 +162,8 @@ public class Game extends javax.swing.JFrame {
 
         char ch = evt.getKeyChar();
         System.out.print(ch);
+        character_count++;
+        wpmLabel.setText("WPM: "+wpmcalc(character_count, uncorr_error)+" words");
         if (ch == KeyEvent.VK_SPACE) //Matches wor whenever you press space
         {
             space++;
@@ -159,6 +177,7 @@ public class Game extends javax.swing.JFrame {
                 flag = 1;
             }
             if (users_word.equals(correct_word)) {
+                uncorr_error=0;
                 currentInputTF.setBackground(Color.WHITE);
                 System.out.println("word matched");
                 count++;
@@ -182,6 +201,7 @@ public class Game extends javax.swing.JFrame {
                 }
             } else {
                 error_count++;
+                uncorr_error++;
                 currentInputTF.setBackground(Color.red);
                 JOptionPane.showMessageDialog(rootPane, "Typing error");
             }
@@ -202,5 +222,6 @@ public class Game extends javax.swing.JFrame {
     private javax.swing.JButton finishButton;
     private javax.swing.JScrollPane paraDisplayer;
     private javax.swing.JTextPane paraTextPane;
+    private javax.swing.JLabel wpmLabel;
     // End of variables declaration//GEN-END:variables
 }
