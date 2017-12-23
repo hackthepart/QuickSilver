@@ -29,15 +29,19 @@
                   <Component id="paraDisplayer" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="speedLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="finishButton" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="0" pref="170" max="32767" attributes="0"/>
-                          </Group>
-                          <Component id="playerNameLabel" max="32767" attributes="0"/>
                           <Component id="currentInputTF" alignment="0" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="speedLabel" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace pref="5" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Component id="playerNameLabel" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="106" max="-2" attributes="0"/>
+                              <Component id="finishButton" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="typedScrollPane" alignment="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="tableScrollPane" min="-2" pref="300" max="-2" attributes="0"/>
@@ -56,12 +60,15 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <Component id="currentInputTF" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="typedScrollPane" pref="56" max="32767" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="finishButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="53" max="32767" attributes="0"/>
                       <Component id="playerNameLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="speedLabel" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="speedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="finishButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
                   <Component id="tableScrollPane" pref="0" max="32767" attributes="0"/>
               </Group>
@@ -141,6 +148,14 @@
               <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
             </Property>
           </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JScrollPane" name="typedScrollPane">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JTextPane" name="typedTextPane">
         </Component>
       </SubComponents>
     </Container>

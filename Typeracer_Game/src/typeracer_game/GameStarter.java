@@ -128,11 +128,6 @@ public class GameStarter extends javax.swing.JFrame {
 
 private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
 // TODO add your handling code here:
-    new Thread () {
-      @Override public void run () {
-      //  GreenhouseControls.startMeUp();
-      }
-    }.start();
     if(nameField.getText().equals("")){
         JOptionPane.showMessageDialog(rootPane, "Enter Name");
     }
@@ -142,8 +137,6 @@ private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
             ob = new Game(nameField.getText());
             this.setVisible(false);
             ob.setVisible(true);
-        //    Thread thread = new Thread((Runnable) ob);
-        //    thread.start();
         } catch (IOException ex) {
             Logger.getLogger(GameStarter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -162,8 +155,6 @@ private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         GameServer object = new GameServer();
         this .setVisible(false);
         object.setVisible(true);
-        //Thread thread = new Thread((Runnable) object);
-        //thread.start();
     }//GEN-LAST:event_serverButtonActionPerformed
 
     /**
