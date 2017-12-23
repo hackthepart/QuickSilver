@@ -48,6 +48,7 @@ public class Game extends javax.swing.JFrame {
     String Ip;
     DefaultTableModel model;
     float wpm;
+    float accuracy;
     
     /**
      * Creates new form NewJFrame
@@ -72,6 +73,8 @@ public class Game extends javax.swing.JFrame {
             
         } catch (IOException ex) {
             System.out.println("Unable to connect to server.");
+            JOptionPane.showMessageDialog(rootPane, "Unable to connect to server.");
+            System.exit(0);
         }
     }
     
@@ -84,17 +87,13 @@ public class Game extends javax.swing.JFrame {
     
     public void gameover(List<String> leaderborad, String name){
         
-        System.out.println(leaderborad);
-        System.out.println(name+":"+wpm+"@"+Ip+":"+port);
-        GameOver gameover = new GameOver(leaderborad,name,wpm,Ip,port);
+        GameOver gameover = new GameOver(leaderborad,name,wpm,accuracy,Ip,port);
         this.setVisible(false);
         gameover.setVisible(true);
-        System.out.println("gameover true");
         
     }
     
     public void updateleaderboard(List<String> onlineplylist){
-    //    model = (DefaultTableModel) onlineTable.getModel();
         for(int i=0;i<onlineplylist.size();i++){
                     model.addRow(new Object[] {onlineplylist.get(i)});
                 }
@@ -135,6 +134,9 @@ public class Game extends javax.swing.JFrame {
     private float wpmcalc(int typed_entries, int uncorrected_errors){
         float time = (int) System.currentTimeMillis();
         float wpm=((typed_entries/5)-uncorrected_errors)*60000/(time-start_time);
+        if(wpm<0){
+            wpm=0;
+        }
         return(wpm);
     }
     
@@ -154,6 +156,9 @@ public class Game extends javax.swing.JFrame {
         wpmLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         onlineTable = new javax.swing.JTable();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        typedTextPane = new javax.swing.JTextPane();
+        acclabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -194,40 +199,59 @@ public class Game extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(onlineTable);
 
+        jScrollPane2.setViewportView(typedTextPane);
+
+        acclabel.setText("Accuracy: 100 %");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(currentInputTF, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(paraDisplayer, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 467, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 115, Short.MAX_VALUE)
-                        .addComponent(finishButton, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(88, 88, 88)
-                        .addComponent(wpmLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(74, 74, 74)))
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(currentInputTF)
+                            .addComponent(paraDisplayer, javax.swing.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(wpmLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(acclabel, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(94, 94, 94)
+                                .addComponent(finishButton, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(10, 10, 10)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 252, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)))
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(15, 15, 15))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(paraDisplayer, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(currentInputTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(finishButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(wpmLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(72, 72, 72))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(paraDisplayer, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                        .addComponent(currentInputTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(wpmLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(acclabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(29, 29, 29)
+                                .addComponent(finishButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(21, 21, 21))
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE))))
                 .addContainerGap())
         );
 
@@ -237,9 +261,6 @@ public class Game extends javax.swing.JFrame {
     private void finishButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_finishButtonActionPerformed
         JOptionPane.showMessageDialog(rootPane, "You exit without completing game!!!");
         gameover=true;
-        //this.setVisible(false);
-        //GameStarter obj = new GameStarter();
-        //obj.setVisible(true);
     }//GEN-LAST:event_finishButtonActionPerformed
 
     private void currentInputTFKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_currentInputTFKeyTyped
@@ -247,14 +268,21 @@ public class Game extends javax.swing.JFrame {
         char ch = evt.getKeyChar();
         System.out.print(ch);
         character_count++;
+        if(character_count > typedTextPane.getText().length()){
+            character_count=typedTextPane.getText().length();
+        }
         wpm=wpmcalc(character_count, uncorr_error);
         wpmLabel.setText("WPM: "+String.format("%1$.2f",wpm)+" words");
+        accuracy = (float) ((float) (space - error_count) / (float) space) * 100;
+        accuracy = (float) Math.ceil(accuracy);
+        if(accuracy>100){
+            accuracy = 100;
+        }
+        acclabel.setText("Accuracy: "+accuracy+" %");
+        currentInputTF.setBackground(Color.WHITE);
         if (ch == KeyEvent.VK_SPACE) //Matches wor whenever you press space
         {
             space++;
-            float itime = (int) System.currentTimeMillis();
-            current_speed = space / ((float) (itime - start_time) / 1000f);
-            System.out.printf("Curent_speed is: %.2f", current_speed);
             users_word = currentInputTF.getText();
             users_word = users_word.trim();
             if (flag == 0) {
@@ -262,36 +290,22 @@ public class Game extends javax.swing.JFrame {
                 flag = 1;
             }
             if (users_word.equals(correct_word)) {
+                typedTextPane.setText(typedTextPane.getText() + " " + correct_word);
                 uncorr_error=0;
-                currentInputTF.setBackground(Color.WHITE);
-                System.out.println("word matched"+start_time+":"+end_time);
+                currentInputTF.setBackground(Color.GREEN);
                 count++;
                 if (words.hasMoreTokens()) {
                     correct_word = words.nextToken();
                 } else {                                         //The game is over.
                     gameover = true;
                     end_time = (int) System.currentTimeMillis();
-                    System.out.println("you are done");
-                    float time = (end_time - start_time) / 1000f;
-                    System.out.println("time is" + time + " " + space + " " + error_count);
-                    float speed = (float) space / time;
-                    Math.ceil(speed);
-                    System.out.println("speed in words per second: " + speed);
-                    float accuracy = (float) ((float) (space - error_count) / (float) space) * 100;
-                    accuracy = (float) Math.ceil(accuracy);
-                    System.out.println("accuracy is" + accuracy);
-                    JOptionPane.showMessageDialog(null, "your accuracy is:" + accuracy + "   " + "\nyour typing speed is:" + speed);
-                    //this.setVisible(false);
-                    //GameStarter obj = new GameStarter();
-                    //obj.setVisible(true);
+                    acclabel.setText("Accuracy: "+accuracy+" %");
                 }
             } else {
                 error_count++;
                 uncorr_error++;
                 currentInputTF.setBackground(Color.red);
-                JOptionPane.showMessageDialog(rootPane, "Typing error");
             }
-
             users_word = "";
             currentInputTF.setText("");
         }
@@ -304,12 +318,15 @@ public class Game extends javax.swing.JFrame {
      */
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel acclabel;
     public javax.swing.JTextField currentInputTF;
     private javax.swing.JButton finishButton;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     public javax.swing.JTable onlineTable;
     private javax.swing.JScrollPane paraDisplayer;
     private javax.swing.JTextPane paraTextPane;
+    private javax.swing.JTextPane typedTextPane;
     private javax.swing.JLabel wpmLabel;
     // End of variables declaration//GEN-END:variables
 }
@@ -330,15 +347,10 @@ class Input implements Runnable {
         try{
             out.writeUTF("0");
             out.writeUTF(name);
-            
             out.writeUTF("1");
-            System.out.println(name);
             onlineplayers = in.readUTF();
-            System.out.println(onlineplayers);
             onlineplylist = Arrays.asList(onlineplayers.split(","));
             game.updatetable(onlineplylist);
-            
-            System.out.println("Game not over");
             while(true){
                 if(game.isgameover()){
                     break;
@@ -350,20 +362,13 @@ class Input implements Runnable {
                     Logger.getLogger(Input.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            System.out.println("Gameover");
-            
-            System.out.println("2");
             out.writeUTF("2");
             out.writeUTF(name+":"+game.wpm);
-            System.out.println("2 done");
-            
             out.writeUTF("3");
-            System.out.println("3");
             leaderboard = in.readUTF();
-            System.out.println(leaderboard);
             leaderboardlist = Arrays.asList(leaderboard.split(","));
-            System.out.println("3 done");
-
+            out.writeUTF("4");
+            out.writeUTF(name);
             game.gameover(leaderboardlist,name);
             
         }catch(IOException e){

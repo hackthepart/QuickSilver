@@ -18,18 +18,20 @@ public class GameOver extends javax.swing.JFrame {
     /**
      * Creates new form GameOver
      */
-    public GameOver(List<String> leaderboard, String name, float wpm, String ip, String port) {
+    public GameOver(List<String> leaderboard, String name, float wpm, float accuracy, String ip, String port) {
         initComponents();
         this.ip=ip;
         this.port=port;
         this.name=name;
-        wpmLabel.setText(String.valueOf(String.format("%1$.2f",wpm)));
+        wpmLabel.setText("WPM: "+String.valueOf(String.format("%1$.2f",wpm)));
         nameLabel.setText(name);
+        accLabel.setText("Accuracy: " + accuracy + "%");
         DefaultTableModel model = (DefaultTableModel) this.leaderboard.getModel();
         for(int i=0;i<leaderboard.size();i++){
             String[] temp = leaderboard.get(i).split(":");
-            model.addRow(new Object[] {String.format("%1$.2f",temp[0]),String.format("%1$.2f",temp[1])});
-                }
+            model.addRow(new Object[] {temp[0],temp[1]});
+        }
+        this.leaderboard.setAutoCreateRowSorter(true);
     }
 
     /**
@@ -47,6 +49,7 @@ public class GameOver extends javax.swing.JFrame {
         wpmLabel = new javax.swing.JLabel();
         RetryButton = new javax.swing.JButton();
         QuitButton = new javax.swing.JButton();
+        accLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -93,6 +96,10 @@ public class GameOver extends javax.swing.JFrame {
             }
         });
 
+        accLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        accLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        accLabel.setText("Accuracy: 100%");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -108,30 +115,36 @@ public class GameOver extends javax.swing.JFrame {
                             .addComponent(wpmLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 83, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 64, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(QuitButton)
+                                .addGap(83, 83, 83))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(RetryButton)
                                 .addGap(73, 73, 73))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(QuitButton)
-                                .addGap(83, 83, 83))))))
+                                .addComponent(accLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(49, 49, 49))))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addComponent(nameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(wpmLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
-                .addComponent(RetryButton)
-                .addGap(18, 18, 18)
-                .addComponent(QuitButton)
-                .addGap(42, 42, 42))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addComponent(nameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(wpmLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(accLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
+                        .addComponent(RetryButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(QuitButton))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -186,6 +199,7 @@ public class GameOver extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton QuitButton;
     private javax.swing.JButton RetryButton;
+    private javax.swing.JLabel accLabel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable leaderboard;
     private javax.swing.JLabel nameLabel;

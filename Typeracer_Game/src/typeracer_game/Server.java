@@ -19,6 +19,7 @@ public class Server extends javax.swing.JFrame {
     static ServerSocket serverSocket;
     static Socket socket;
     static Users[] user = new Users[10];
+    String onlineplayers="Admin",leaderboard="Admin:30";
     /**
      * Creates new form Server
      */
@@ -27,16 +28,13 @@ public class Server extends javax.swing.JFrame {
         try {
             serverSocket = new ServerSocket(4444);
             while(true){
-                System.out.println("not Connected");
                 socket = serverSocket.accept();
-                System.out.println("Connected");
                 for(int i=0;i<10;i++){
                     if(user[i]==null){
                         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
                         DataInputStream in = new DataInputStream(socket.getInputStream());
-                        user[i]=new Users(out,in,user,i);
+                        user[i]=new Users(out,in,user,i,this);
                         Thread thread = new Thread(user[i]);
-                        System.out.println(i);
                         thread.start();
                         break;
                     }
@@ -45,6 +43,18 @@ public class Server extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void addtoleaderboard(String score){
+        leaderboard=leaderboard+","+score;
+    }
+    
+    public void addtoonlineplayers(String name){
+        onlineplayers=onlineplayers+","+name;
+    }
+    
+    public void removeonlineplayer(String name){
+        onlineplayers = onlineplayers.replaceAll(","+name, "");
     }
 
     /**
@@ -127,11 +137,13 @@ class Users implements Runnable{
 	Users[] user = new Users[10];
         String onlineplayers="";
         int pid;
-	public Users(DataOutputStream out, DataInputStream in,Users[] user,int pid){
+        Server server;
+	public Users(DataOutputStream out, DataInputStream in,Users[] user,int pid,Server server){
 		this.out=out;
 		this.in=in;
 		this.pid=pid;
                 this.user=user;
+                this.server=server;
 	}
 	public void run(){
             while(true){
@@ -140,28 +152,22 @@ class Users implements Runnable{
                     if(message.equals("0")){        //add name to online users
                         String name;
                         name=in.readUTF();
-                        onlineplayers+=name;
-                        System.out.println("0 done"+name);
+                        server.addtoonlineplayers(name);
                     }
-                    else if(message.equals("1")){
-                        System.out.println("1 started");
-                        out.writeUTF("Arsh,Anshul,asf,daf,gg");
-                        System.out.println("1 done");
+                    else if(message.equals("1")){               //return online players
+                        out.writeUTF(server.onlineplayers);
                     }
-                    else if(message.equals("2")){
-                        System.out.println("2 started");
+                    else if(message.equals("2")){           //add to leaderboard
                         String result = in.readUTF();
-                        System.out.println("2 done"+result);
+                        server.addtoleaderboard(result);
                     }
-                    else if(message.equals("3")){
-                        System.out.println("3 started");
-                        out.writeUTF("Arsh:33,Anshul:44");
-                        System.out.println("3 done");
+                    else if(message.equals("3")){               //return leaderboard
+                        out.writeUTF(server.leaderboard);
                     }
-                    else{
-
+                    else if(message.equals("4")){
+                        String name = in.readUTF();
+                        server.removeonlineplayer(name);
                     }
-                    System.out.println("pid:"+pid);
                 }catch(IOException e){
                     user[pid]=null;
                 }
