@@ -10,6 +10,11 @@
  */
 package typeracer_game;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Rashi
@@ -34,6 +39,11 @@ public class GameStarter extends javax.swing.JFrame {
 
         startButton = new javax.swing.JButton();
         titleLabel = new javax.swing.JLabel();
+        quitButton = new javax.swing.JButton();
+        serverButton = new javax.swing.JButton();
+        nameLabel = new javax.swing.JLabel();
+        nameField = new javax.swing.JTextField();
+        messageLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -48,27 +58,69 @@ public class GameStarter extends javax.swing.JFrame {
         titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         titleLabel.setText("Type RACER ...");
 
+        quitButton.setText("Quit");
+        quitButton.setActionCommand("Quit");
+        quitButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                quitButtonActionPerformed(evt);
+            }
+        });
+
+        serverButton.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        serverButton.setText("Start DEDICATED Server");
+        serverButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                serverButtonActionPerformed(evt);
+            }
+        });
+
+        nameLabel.setText("Enter Name :");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(145, Short.MAX_VALUE)
-                .addComponent(startButton)
-                .addGap(158, 158, 158))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(titleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(titleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(nameLabel)
+                        .addGap(18, 18, 18)
+                        .addComponent(nameField)
+                        .addGap(10, 10, 10))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(startButton, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(quitButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(messageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(serverButton)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(titleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(nameLabel)
+                    .addComponent(nameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addComponent(startButton)
-                .addContainerGap(169, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(quitButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(messageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(serverButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -76,11 +128,43 @@ public class GameStarter extends javax.swing.JFrame {
 
 private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
 // TODO add your handling code here:
-    Game ob = new Game();
-    this.setVisible(false);
-    ob.setVisible(true);
-
+    new Thread () {
+      @Override public void run () {
+      //  GreenhouseControls.startMeUp();
+      }
+    }.start();
+    if(nameField.getText().equals("")){
+        JOptionPane.showMessageDialog(rootPane, "Enter Name");
+    }
+    else{
+        Game ob;
+        try {
+            ob = new Game(nameField.getText());
+            this.setVisible(false);
+            ob.setVisible(true);
+        //    Thread thread = new Thread((Runnable) ob);
+        //    thread.start();
+        } catch (IOException ex) {
+            Logger.getLogger(GameStarter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }//GEN-LAST:event_startButtonActionPerformed
+
+    private void quitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quitButtonActionPerformed
+        // TODO add your handling code here:
+        System.exit(0);
+    }//GEN-LAST:event_quitButtonActionPerformed
+
+    private void serverButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serverButtonActionPerformed
+        // TODO add your handling code here:
+        messageLabel.setText("Server Started and Running ...");
+        messageLabel.paintImmediately(messageLabel.getVisibleRect());
+        GameServer object = new GameServer();
+        this .setVisible(false);
+        object.setVisible(true);
+        //Thread thread = new Thread((Runnable) object);
+        //thread.start();
+    }//GEN-LAST:event_serverButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -96,6 +180,11 @@ private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel messageLabel;
+    private javax.swing.JTextField nameField;
+    private javax.swing.JLabel nameLabel;
+    private javax.swing.JButton quitButton;
+    private javax.swing.JButton serverButton;
     private javax.swing.JButton startButton;
     private javax.swing.JLabel titleLabel;
     // End of variables declaration//GEN-END:variables
