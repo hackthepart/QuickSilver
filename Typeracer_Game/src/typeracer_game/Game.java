@@ -5,12 +5,20 @@
  */
 package typeracer_game;
 
+import com.sun.jmx.defaults.JmxProperties;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -18,8 +26,10 @@ import javax.swing.JOptionPane;
  */
 public class Game extends javax.swing.JFrame {
 
+    static Socket socket;
+    static DataInputStream in;
+    static DataOutputStream out;
     float current_speed;
-
     String users_word;
     int flag = 0;
     int start_time;
@@ -29,18 +39,43 @@ public class Game extends javax.swing.JFrame {
     int count = 0, totalWords;
     StringTokenizer words;
     String correct_word = "";
-
+    String playerName, message;
+    int port;
+    DefaultTableModel model;
+    int pID;
+    int[] pids;
     /**
      * Creates new form NewJFrame
      */
-    public Game() {
+    public Game(String playerName) throws IOException {
         initComponents();
         showPara();
+        this.playerName = playerName;
+        port = 9999;
+        pids = new int[100];
+        model = (DefaultTableModel)leaderboardTable.getModel();
+        playerNameLabel.setText(playerName);
         paraTextPane.setEditable(false);
         currentInputTF.requestFocus(true);
         words = new StringTokenizer(para);
         totalWords = words.countTokens();
+        System.out.println("c1");
+        socket = new Socket("127.0.0.1",9999);
+        System.out.println("c2");
+        in = new DataInputStream(socket.getInputStream());
+        out = new DataOutputStream(socket.getOutputStream());
+        Input input = new Input(in, this);
+        Thread thread = new Thread(input);
+        thread.start();
+        out.writeUTF(playerName);
+        pID = in.readInt();
         start_time = (int) System.currentTimeMillis();
+    }
+    
+    void UpdateLeaderboard(String playerName, int speed, int pID){
+        model.setValueAt(playerName, pID, 0);
+        model.setValueAt(speed, pID, 1);
+        
     }
 
     private void showPara() {
@@ -87,6 +122,9 @@ public class Game extends javax.swing.JFrame {
         paraDisplayer = new javax.swing.JScrollPane();
         paraTextPane = new javax.swing.JTextPane();
         speedLabel = new javax.swing.JLabel();
+        playerNameLabel = new javax.swing.JLabel();
+        tableScrollPane = new javax.swing.JScrollPane();
+        leaderboardTable = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -108,26 +146,45 @@ public class Game extends javax.swing.JFrame {
 
         speedLabel.setText("Current Speed (WPM) : 0");
 
+        playerNameLabel.setText("Name : Nil");
+
+        leaderboardTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "Name", "Speed (WPM)"
+            }
+        ));
+        tableScrollPane.setViewportView(leaderboardTable);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(currentInputTF, javax.swing.GroupLayout.DEFAULT_SIZE, 597, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(153, 153, 153)
-                        .addComponent(finishButton))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(42, 42, 42)
-                        .addComponent(paraDisplayer, javax.swing.GroupLayout.PREFERRED_SIZE, 467, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(speedLabel)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(paraDisplayer)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(speedLabel)
+                                    .addComponent(finishButton))
+                                .addGap(0, 170, Short.MAX_VALUE))
+                            .addComponent(playerNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(currentInputTF))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -135,11 +192,16 @@ public class Game extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(paraDisplayer, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(currentInputTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
-                .addComponent(finishButton)
-                .addGap(47, 47, 47)
-                .addComponent(speedLabel)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(currentInputTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(finishButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
+                        .addComponent(playerNameLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(speedLabel))
+                    .addComponent(tableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -154,7 +216,7 @@ public class Game extends javax.swing.JFrame {
     }//GEN-LAST:event_finishButtonActionPerformed
 
     private void currentInputTFKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_currentInputTFKeyTyped
-
+        currentInputTF.setBackground(Color.white);
         char ch = evt.getKeyChar();
         System.out.print(ch);
         if (ch == KeyEvent.VK_SPACE) //Matches word whenever you press space
@@ -165,6 +227,11 @@ public class Game extends javax.swing.JFrame {
             System.out.printf("Curent_speed is: %.2f", current_speed);
             speedLabel.setText("Current Speed (WPM) : " + Math.ceil(current_speed*60.0));
             speedLabel.paintImmediately(speedLabel.getVisibleRect());
+            try {
+                out.writeUTF(playerName + (int)(Math.ceil(current_speed*60)));
+            } catch (IOException ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            }
             users_word = currentInputTF.getText();
             users_word = users_word.trim();
             if (flag == 0) {
@@ -172,7 +239,7 @@ public class Game extends javax.swing.JFrame {
                 flag = 1;
             }
             if (users_word.equals(correct_word)) {
-                currentInputTF.setBackground(Color.WHITE);
+                currentInputTF.setBackground(Color.green);
                 System.out.println("word matched");
                 count++;
                 if (words.hasMoreTokens()) {
@@ -213,8 +280,56 @@ public class Game extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JTextField currentInputTF;
     private javax.swing.JButton finishButton;
+    private javax.swing.JTable leaderboardTable;
     private javax.swing.JScrollPane paraDisplayer;
     private javax.swing.JTextPane paraTextPane;
+    private javax.swing.JLabel playerNameLabel;
     private javax.swing.JLabel speedLabel;
+    private javax.swing.JScrollPane tableScrollPane;
     // End of variables declaration//GEN-END:variables
+}
+
+
+class Input implements Runnable{
+	public String message;
+	DataInputStream in;
+        Game object;
+        int pID;
+	public Input(DataInputStream in, Game o){
+            this.in = in;
+            this.object = o;
+            pID = o.pID;
+	}
+	public void run(){
+            while(true){
+                try{
+                    message = in.readUTF();
+                    System.out.println("Data recieved:" + message);
+                    char[] str = message.toCharArray();
+                    String name = "";
+                    int speedWPM = 0;
+                    boolean flag = false;
+                    for(int i=0 ; i<str.length ; i++){
+                        if(flag == false){
+                            if(str[i] != ':'){
+                                name = name + str[i];
+                            }
+                            else{
+                                flag = true;
+                            }
+                        }
+                        else{
+                            speedWPM = speedWPM * 10 + (Integer.parseInt("" + str[i]));
+                        }
+                    }
+                    System.out.println("Speed of pid: " + pID + " is : " + speedWPM);
+                    object.UpdateLeaderboard(name, speedWPM, pID);
+                }catch(IOException e){
+                    e.printStackTrace();
+                    System.out.println("error here");
+                    JOptionPane.showMessageDialog(null, "Server connection problem !!!");
+                    System.exit(1);
+                }
+            }
+	}
 }
