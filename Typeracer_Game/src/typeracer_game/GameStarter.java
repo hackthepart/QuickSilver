@@ -10,16 +10,19 @@
  */
 package typeracer_game;
 
+import javax.swing.JOptionPane;
+
 /**
  *
- * @author Rashi
+ * @author Anuj_descifrado
  */
-public class GameStarter extends javax.swing.JFrame {
-
-    /**
+public class GameStarter extends javax.swing.JFrame
+{
+     /**
      * Creates new form start
      */
-    public GameStarter() {
+    public GameStarter() 
+    {
         initComponents();
     }
 
@@ -32,59 +35,112 @@ public class GameStarter extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        startButton = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        startButton.setText("Start New Game!!");
-        startButton.addActionListener(new java.awt.event.ActionListener() {
+        jPanel1.setLayout(null);
+
+        jButton1.setText("EXIT");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                startButtonActionPerformed(evt);
+                jButton1ActionPerformed(evt);
             }
         });
+        jPanel1.add(jButton1);
+        jButton1.setBounds(340, 270, 80, 30);
+
+        jLabel4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel4MouseClicked(evt);
+            }
+        });
+        jPanel1.add(jLabel4);
+        jLabel4.setBounds(310, 220, 120, 30);
+
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/typeracer_game/com.bonfiremedia.typeracer.png"))); // NOI18N
+        jPanel1.add(jLabel3);
+        jLabel3.setBounds(0, -10, 510, 330);
+
+        jLabel1.setToolTipText("Click To Start The Game");
+        jLabel1.setEnabled(false);
+        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel1MouseClicked(evt);
+            }
+        });
+        jPanel1.add(jLabel1);
+        jLabel1.setBounds(320, 110, 110, 50);
+
+        jLabel2.setEnabled(false);
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel2MouseClicked(evt);
+            }
+        });
+        jPanel1.add(jLabel2);
+        jLabel2.setBounds(300, 170, 140, 30);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(145, Short.MAX_VALUE)
-                .addComponent(startButton)
-                .addGap(158, 158, 158))
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(112, 112, 112)
-                .addComponent(startButton)
-                .addContainerGap(169, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 309, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
-// TODO add your handling code here:
+    private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
+    // TODO add your handling code here:
     Game ob = new Game();
     this.setVisible(false);
     ob.setVisible(true);
+    }//GEN-LAST:event_jLabel1MouseClicked
 
-}//GEN-LAST:event_startButtonActionPerformed
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+       new leaderboard().show();
+       this.dispose();
+        
+    }//GEN-LAST:event_jLabel2MouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
+       JOptionPane.showMessageDialog(this,"More Games To Be Come Sooner"+" \n           STAY CONNECTED");
+    }//GEN-LAST:event_jLabel4MouseClicked
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-
+    public static void main(String args[]) 
+    {
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-
-            public void run() {
+        java.awt.EventQueue.invokeLater(new Runnable()
+        {
+            public void run() 
+            {
                 new GameStarter().setVisible(true);
             }
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton startButton;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }
