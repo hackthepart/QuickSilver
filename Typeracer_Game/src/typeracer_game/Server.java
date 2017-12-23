@@ -18,24 +18,27 @@ public class Server extends javax.swing.JFrame {
 
     static ServerSocket serverSocket;
     static Socket socket;
-    static Users[] user = new Users[10];
+    static Users[] user;
     static int port;
+    int no_of_clients;
     String onlineplayers="Admin",leaderboard="Admin:30";
     /**
      * Creates new form Server
      */
-    public Server(int port) {
+    public Server(int port,int no_of_clients) {
         initComponents();
         this.port=port;
+        this.no_of_clients=no_of_clients;
+        user = new Users[no_of_clients];
         try {
             serverSocket = new ServerSocket(port);
             while(true){
                 socket = serverSocket.accept();
-                for(int i=0;i<10;i++){
+                for(int i=0;i<no_of_clients;i++){
                     if(user[i]==null){
                         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
                         DataInputStream in = new DataInputStream(socket.getInputStream());
-                        user[i]=new Users(out,in,user,i,this);
+                        user[i]=new Users(out,in,user,i,no_of_clients,this);
                         Thread thread = new Thread(user[i]);
                         thread.start();
                         break;
@@ -114,7 +117,7 @@ public class Server extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Server(port).setVisible(true);
+                //new Server(port,no_of_clients).setVisible(true);
             }
         });
     }
@@ -125,16 +128,18 @@ public class Server extends javax.swing.JFrame {
 class Users implements Runnable{
 	DataOutputStream out;
 	DataInputStream in;
-	Users[] user = new Users[10];
+	Users[] user;
         String onlineplayers="";
-        int pid;
+        int pid,no_of_clients;
         Server server;
-	public Users(DataOutputStream out, DataInputStream in,Users[] user,int pid,Server server){
+	public Users(DataOutputStream out, DataInputStream in, Users[] user, int pid, int no_of_clients, Server server){
 		this.out=out;
 		this.in=in;
 		this.pid=pid;
                 this.user=user;
+                this.no_of_clients=no_of_clients;
                 this.server=server;
+                user = new Users[no_of_clients];
 	}
 	public void run(){
             while(true){
