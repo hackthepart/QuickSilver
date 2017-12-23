@@ -8,9 +8,19 @@ package typeracer_game;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
+import java.net.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -28,13 +38,17 @@ public class Game extends javax.swing.JFrame {
     int space = 0, error_count = 0;
     int character_count = 0, curr_error_count = 0,uncorr_error = 0;
     int count = 0, totalWords;
+    boolean gameover=false;
     StringTokenizer words;
     String correct_word = "";
-
+    static Socket socket;
+    static DataInputStream in;
+    static DataOutputStream out;
+    DefaultTableModel model;
     /**
      * Creates new form NewJFrame
      */
-    public Game() {
+    public Game(String name, String ip, String port) {
         initComponents();
         showPara();
         paraTextPane.setEditable(false);
@@ -42,8 +56,34 @@ public class Game extends javax.swing.JFrame {
         words = new StringTokenizer(para);
         totalWords = words.countTokens();
         start_time = (int) System.currentTimeMillis();
+        try {
+            socket=new Socket(ip,Integer.parseInt(port));
+            in = new DataInputStream(socket.getInputStream());
+            out = new DataOutputStream(socket.getOutputStream());
+            Input input = new Input(in,out,name,this);
+            Thread thread = new Thread(input);
+            thread.start();
+            
+        } catch (IOException ex) {
+            System.out.println("Unable to connect to server.");
+        }
     }
-
+    
+    public void updatetable(List<String> onlineplylist){
+        model = (DefaultTableModel) onlineTable.getModel();
+        for(int i=0;i<onlineplylist.size();i++){
+                    model.addRow(new Object[] {onlineplylist.get(i)});
+                }
+    }
+    
+    public void clearrable(){
+        model.setRowCount(0);
+    }
+    
+    public boolean isgameover(){
+        return gameover;
+    }
+    
     private void showPara() {
         String thisLine = null;
         int a;
@@ -92,6 +132,8 @@ public class Game extends javax.swing.JFrame {
         paraDisplayer = new javax.swing.JScrollPane();
         paraTextPane = new javax.swing.JTextPane();
         wpmLabel = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        onlineTable = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -111,28 +153,45 @@ public class Game extends javax.swing.JFrame {
         paraTextPane.setEditable(false);
         paraDisplayer.setViewportView(paraTextPane);
 
+        wpmLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         wpmLabel.setText("WPM: 0.0 words");
+
+        onlineTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Online Players"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(onlineTable);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(currentInputTF, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(paraDisplayer, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 467, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(currentInputTF, javax.swing.GroupLayout.DEFAULT_SIZE, 597, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(42, 42, 42)
-                        .addComponent(paraDisplayer, javax.swing.GroupLayout.PREFERRED_SIZE, 467, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(finishButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(wpmLabel)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 115, Short.MAX_VALUE)
+                        .addComponent(finishButton, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(107, 107, 107)
+                        .addComponent(wpmLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(85, 85, 85)))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(15, 15, 15))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -143,9 +202,13 @@ public class Game extends javax.swing.JFrame {
                 .addComponent(currentInputTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(finishButton)
-                    .addComponent(wpmLabel))
+                    .addComponent(finishButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(wpmLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(72, 72, 72))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
@@ -153,9 +216,10 @@ public class Game extends javax.swing.JFrame {
 
     private void finishButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_finishButtonActionPerformed
         JOptionPane.showMessageDialog(rootPane, "You exit without completing game!!!");
-        this.setVisible(false);
-        GameStarter obj = new GameStarter();
-        obj.setVisible(true);
+        gameover=true;
+        //this.setVisible(false);
+        //GameStarter obj = new GameStarter();
+        //obj.setVisible(true);
     }//GEN-LAST:event_finishButtonActionPerformed
 
     private void currentInputTFKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_currentInputTFKeyTyped
@@ -184,6 +248,7 @@ public class Game extends javax.swing.JFrame {
                 if (words.hasMoreTokens()) {
                     correct_word = words.nextToken();
                 } else {                                         //The game is over.
+                    gameover = true;
                     end_time = (int) System.currentTimeMillis();
                     System.out.println("you are done");
                     float time = (end_time - start_time) / 1000f;
@@ -195,9 +260,9 @@ public class Game extends javax.swing.JFrame {
                     accuracy = (float) Math.ceil(accuracy);
                     System.out.println("accuracy is" + accuracy);
                     JOptionPane.showMessageDialog(null, "your accuracy is:" + accuracy + "   " + "\nyour typing speed is:" + speed);
-                    this.setVisible(false);
-                    GameStarter obj = new GameStarter();
-                    obj.setVisible(true);
+                    //this.setVisible(false);
+                    //GameStarter obj = new GameStarter();
+                    //obj.setVisible(true);
                 }
             } else {
                 error_count++;
@@ -220,8 +285,47 @@ public class Game extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JTextField currentInputTF;
     private javax.swing.JButton finishButton;
+    private javax.swing.JScrollPane jScrollPane1;
+    public javax.swing.JTable onlineTable;
     private javax.swing.JScrollPane paraDisplayer;
     private javax.swing.JTextPane paraTextPane;
     private javax.swing.JLabel wpmLabel;
     // End of variables declaration//GEN-END:variables
+}
+
+class Input implements Runnable {
+    DataInputStream in;
+    DataOutputStream out;
+    String name="",onlineplayers="",leaderboard;
+    List<String> onlineplylist,leaderboardlist;
+    Game game;
+    public Input(DataInputStream in,DataOutputStream out,String name,Game game){
+        this.in=in;
+        this.out=out;
+        this.name=name;
+        this.game=game;
+    }
+    public void run(){
+        try{
+            out.writeUTF("0");
+            out.writeUTF(name);
+            out.writeUTF("1");
+            System.out.println(name);
+            onlineplayers = in.readUTF();
+            System.out.println(onlineplayers);
+            onlineplylist = Arrays.asList(onlineplayers.split(","));
+            game.updatetable(onlineplylist);
+            while(!game.gameover){System.out.println("n");}
+            System.out.println("Gameover");
+            out.writeUTF("2");System.out.println("2");
+            leaderboard = in.readUTF();
+            System.out.println("2 done");
+            System.out.println(leaderboard);
+            leaderboardlist = Arrays.asList(leaderboard.split(","));
+            game.clearrable();
+            game.updatetable(leaderboardlist);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
 }
