@@ -11,6 +11,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
+import javax.swing.text.JTextComponent;
 
 /**
  *
@@ -30,6 +34,10 @@ public class Game extends javax.swing.JFrame {
     int count = 0, totalWords;
     StringTokenizer words;
     String correct_word = "";
+    boolean paused=false;
+    int curPos=0;
+    boolean change=false;
+    boolean endThread=false;
 
     /**
      * Creates new form NewJFrame
@@ -78,7 +86,7 @@ public class Game extends javax.swing.JFrame {
             @Override
             public void run() {
                 try {
-                    while (true) {
+                    while (!endThread) {
                         float accuracy=100;
                         if (space!=0)
                             accuracy = (float) ((float) (space - error_count) / (float) space) * 100;
@@ -86,6 +94,17 @@ public class Game extends javax.swing.JFrame {
                         float spd=current_speed*60;
                         txtSpeed.setText(String.format("Speed : %.1f wpm",spd));
                         paraTextPane.select(0,space);
+                        txtWord.setText(correct_word);
+                        if (start_time!=-1&&!paused) {
+                            int time=(int) System.currentTimeMillis()-start_time-pause_time;
+                            time=time/100;
+                            txtTime.setText("Time : "+(time/10)+"."+(time%10)+" sec");
+                        }
+                        if (change) {
+                            highlight(paraTextPane,curPos);
+                            change=false;
+                        }
+                        Thread.sleep(50);
                     }
                 }
                 catch (Exception e) {
@@ -96,6 +115,25 @@ public class Game extends javax.swing.JFrame {
         display.start();
     }
 
+    class MyHighlightPainter extends DefaultHighlighter.DefaultHighlightPainter {
+        public MyHighlightPainter(Color col) {
+            super(col);
+        }
+    }
+    Highlighter.HighlightPainter myHighlightPainter = new MyHighlightPainter(Color.CYAN);
+    public void highlight(JTextComponent textComp,int end) {
+        try {
+            Highlighter hilite = textComp.getHighlighter();
+            Document doc = textComp.getDocument();
+            String text=doc.getText(0,doc.getLength());
+            hilite.addHighlight(0,end,myHighlightPainter);
+        }
+        catch (Exception e) {
+
+        }
+    }
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -112,6 +150,8 @@ public class Game extends javax.swing.JFrame {
         btnQuit = new javax.swing.JButton();
         txtAcc = new javax.swing.JLabel();
         txtSpeed = new javax.swing.JLabel();
+        txtWord = new javax.swing.JLabel();
+        txtTime = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -147,34 +187,50 @@ public class Game extends javax.swing.JFrame {
         txtSpeed.setForeground(new java.awt.Color(51, 51, 51));
         txtSpeed.setText("Speed : ");
 
+        txtWord.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        txtWord.setText("Word : ");
+
+        txtTime.setText("Time : 0.0 sec");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(paraDisplayer)
-                    .addComponent(currentInputTF)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(finishButton, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 199, Short.MAX_VALUE)
-                        .addComponent(btnQuit, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(paraDisplayer)
+                            .addComponent(currentInputTF)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(finishButton, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 199, Short.MAX_VALUE)
+                                .addComponent(btnQuit, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(41, 41, 41)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(txtTime, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(txtAcc, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(77, 77, 77)
+                                .addComponent(txtSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(56, 56, 56)
+                                .addComponent(txtWord, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGap(41, 41, 41)
-                .addComponent(txtAcc, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(77, 77, 77)
-                .addComponent(txtSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(40, Short.MAX_VALUE)
+                .addContainerGap(37, Short.MAX_VALUE)
+                .addComponent(txtTime, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtAcc)
-                    .addComponent(txtSpeed))
+                    .addComponent(txtSpeed)
+                    .addComponent(txtWord))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(paraDisplayer, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -186,7 +242,7 @@ public class Game extends javax.swing.JFrame {
                 .addGap(8, 8, 8))
         );
 
-        setSize(new java.awt.Dimension(639, 462));
+        setSize(new java.awt.Dimension(639, 504));
         setLocationRelativeTo(null);
     }// </editor-fold>                        
 
@@ -194,6 +250,7 @@ public class Game extends javax.swing.JFrame {
         int val=JOptionPane.showConfirmDialog(null, "You exit without completing game!!!");
         if (val!=0)
             return;
+        endThread=true;
         this.setVisible(false);
         GameStarter obj = new GameStarter();
         obj.setVisible(true);
@@ -222,6 +279,8 @@ public class Game extends javax.swing.JFrame {
                 currentInputTF.setBackground(Color.WHITE);
                 System.out.println("word matched");
                 count++;
+                curPos+=correct_word.length()+1;
+                change=true;
                 if (words.hasMoreTokens()) {
                     correct_word = words.nextToken();
                 } else {                                         //The game is over.
@@ -235,18 +294,21 @@ public class Game extends javax.swing.JFrame {
                     float accuracy = (float) ((float) (space - error_count) / (float) space) * 100;
                     //accuracy = (float) Math.ceil(accuracy);
                     System.out.println("accuracy is" + accuracy);
-                    
-                    JOptionPane.showMessageDialog(null, "Accuracy : " + accuracy + "%\nSpeed : " + (speed*60));
+                    paused=true;
+                    //JOptionPane.showMessageDialog(null, "Accuracy : " + accuracy + "%\nSpeed : " + (speed*60));
+                    Popup window = new Popup();
+                    window.showResult(accuracy, speed,error_count,(int)(time*1000));
+                    window.setVisible(true);
                     this.setVisible(false);
-                    GameStarter obj = new GameStarter();
-                    obj.setVisible(true);
                 }
             } else {
                 error_count++;
                 currentInputTF.setBackground(Color.red);
                 int t1=(int) System.currentTimeMillis();
+                paused=true;
                 JOptionPane.showMessageDialog(rootPane, "Typing error");
                 int t2=(int) System.currentTimeMillis();
+                paused=false;
                 pause_time+=t2-t1;
             }
 
@@ -262,6 +324,7 @@ public class Game extends javax.swing.JFrame {
         int val=JOptionPane.showConfirmDialog(null, "Are you sure you want to Exit !");
         if (val!=0)
             return;
+        endThread=true;
         System.exit(0);
     }                                       
 
@@ -277,5 +340,7 @@ public class Game extends javax.swing.JFrame {
     private javax.swing.JTextPane paraTextPane;
     private javax.swing.JLabel txtAcc;
     private javax.swing.JLabel txtSpeed;
+    private javax.swing.JLabel txtTime;
+    private javax.swing.JLabel txtWord;
     // End of variables declaration                   
 }
