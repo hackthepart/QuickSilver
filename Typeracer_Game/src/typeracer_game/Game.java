@@ -44,20 +44,26 @@ public class Game extends javax.swing.JFrame {
     static Socket socket;
     static DataInputStream in;
     static DataOutputStream out;
+    String port;
+    String Ip;
     DefaultTableModel model;
+    float wpm;
+    
     /**
      * Creates new form NewJFrame
      */
     public Game(String name, String ip, String port) {
         initComponents();
         showPara();
+        this.Ip=ip;
+        this.port=port;
         paraTextPane.setEditable(false);
         currentInputTF.requestFocus(true);
         words = new StringTokenizer(para);
         totalWords = words.countTokens();
         start_time = (int) System.currentTimeMillis();
         try {
-            socket=new Socket(ip,Integer.parseInt(port));
+            socket=new Socket(ip,Integer.valueOf(port));
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
             Input input = new Input(in,out,name,this);
@@ -76,8 +82,22 @@ public class Game extends javax.swing.JFrame {
                 }
     }
     
-    public void clearrable(){
-        model.setRowCount(0);
+    public void gameover(List<String> leaderborad, String name){
+        
+        System.out.println(leaderborad);
+        System.out.println(name+":"+wpm+"@"+Ip+":"+port);
+        GameOver gameover = new GameOver(leaderborad,name,wpm,Ip,port);
+        this.setVisible(false);
+        gameover.setVisible(true);
+        System.out.println("gameover true");
+        
+    }
+    
+    public void updateleaderboard(List<String> onlineplylist){
+    //    model = (DefaultTableModel) onlineTable.getModel();
+        for(int i=0;i<onlineplylist.size();i++){
+                    model.addRow(new Object[] {onlineplylist.get(i)});
+                }
     }
     
     public boolean isgameover(){
@@ -187,9 +207,9 @@ public class Game extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 115, Short.MAX_VALUE)
                         .addComponent(finishButton, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(107, 107, 107)
-                        .addComponent(wpmLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(85, 85, 85)))
+                        .addGap(88, 88, 88)
+                        .addComponent(wpmLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(74, 74, 74)))
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(15, 15, 15))
         );
@@ -227,7 +247,8 @@ public class Game extends javax.swing.JFrame {
         char ch = evt.getKeyChar();
         System.out.print(ch);
         character_count++;
-        wpmLabel.setText("WPM: "+wpmcalc(character_count, uncorr_error)+" words");
+        wpm=wpmcalc(character_count, uncorr_error);
+        wpmLabel.setText("WPM: "+String.format("%1$.2f",wpm)+" words");
         if (ch == KeyEvent.VK_SPACE) //Matches wor whenever you press space
         {
             space++;
@@ -243,7 +264,7 @@ public class Game extends javax.swing.JFrame {
             if (users_word.equals(correct_word)) {
                 uncorr_error=0;
                 currentInputTF.setBackground(Color.WHITE);
-                System.out.println("word matched");
+                System.out.println("word matched"+start_time+":"+end_time);
                 count++;
                 if (words.hasMoreTokens()) {
                     correct_word = words.nextToken();
@@ -309,21 +330,42 @@ class Input implements Runnable {
         try{
             out.writeUTF("0");
             out.writeUTF(name);
+            
             out.writeUTF("1");
             System.out.println(name);
             onlineplayers = in.readUTF();
             System.out.println(onlineplayers);
             onlineplylist = Arrays.asList(onlineplayers.split(","));
             game.updatetable(onlineplylist);
-            while(!game.gameover){System.out.println("n");}
+            
+            System.out.println("Game not over");
+            while(true){
+                if(game.isgameover()){
+                    break;
+                }
+                System.out.print(".");
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Input.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
             System.out.println("Gameover");
-            out.writeUTF("2");System.out.println("2");
-            leaderboard = in.readUTF();
+            
+            System.out.println("2");
+            out.writeUTF("2");
+            out.writeUTF(name+":"+game.wpm);
             System.out.println("2 done");
+            
+            out.writeUTF("3");
+            System.out.println("3");
+            leaderboard = in.readUTF();
             System.out.println(leaderboard);
             leaderboardlist = Arrays.asList(leaderboard.split(","));
-            game.clearrable();
-            game.updatetable(leaderboardlist);
+            System.out.println("3 done");
+
+            game.gameover(leaderboardlist,name);
+            
         }catch(IOException e){
             e.printStackTrace();
         }
