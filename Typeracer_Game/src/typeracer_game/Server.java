@@ -19,14 +19,16 @@ public class Server extends javax.swing.JFrame {
     static ServerSocket serverSocket;
     static Socket socket;
     static Users[] user = new Users[10];
+    static int port;
     String onlineplayers="Admin",leaderboard="Admin:30";
     /**
      * Creates new form Server
      */
-    public Server() {
+    public Server(int port) {
         initComponents();
+        this.port=port;
         try {
-            serverSocket = new ServerSocket(4444);
+            serverSocket = new ServerSocket(port);
             while(true){
                 socket = serverSocket.accept();
                 for(int i=0;i<10;i++){
@@ -66,27 +68,17 @@ public class Server extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTextField1 = new javax.swing.JTextField();
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jTextField1.setText("jTextField1");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(81, 81, 81)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(260, Short.MAX_VALUE))
+            .addGap(0, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(89, 89, 89)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(191, Short.MAX_VALUE))
+            .addGap(0, 300, Short.MAX_VALUE)
         );
 
         pack();
@@ -122,13 +114,12 @@ public class Server extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Server().setVisible(true);
+                new Server(port).setVisible(true);
             }
         });
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }
 class Users implements Runnable{
