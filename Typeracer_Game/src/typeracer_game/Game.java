@@ -14,6 +14,9 @@ import java.io.DataOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -201,7 +204,7 @@ public class Game extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(currentInputTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(typedScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
+                        .addComponent(typedScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
                         .addComponent(playerNameLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -263,6 +266,20 @@ public class Game extends javax.swing.JFrame {
                     accuracy = (float) Math.ceil(accuracy);
                     System.out.println("accuracy is" + accuracy);
                     JOptionPane.showMessageDialog(null, "Hey " + playerName + "\nyour accuracy is:" + accuracy + "   " + "\nyour typing speed is: " + Math.ceil(speed) + " WPM");
+                    
+                    //ADDING DETAILS OF THE PLAYER TO OUR DATABASE
+                    try
+                    {
+                        Class.forName("java.sql.Driver");
+                        Connection con=DriverManager.getConnection("jdbc:mysql://localhost/typerace","root","modi");
+                        Statement stmt=con.createStatement();
+                        String q="insert into user values('"+(playerName)+"','"+(accuracy)+"','"+(error_count)+"','"+(speed)+"',);";
+                        stmt.executeUpdate(q);
+                    }
+                    catch(Exception e)
+                    {
+                        JOptionPane.showMessageDialog(this,e.getMessage());
+                    }
                     assignRemark(accuracy, space);
                     this.setVisible(false);
                     GameStarter obj = new GameStarter();
