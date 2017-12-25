@@ -15,12 +15,14 @@ import javax.swing.table.DefaultTableModel;
 public class GameOver extends javax.swing.JFrame {
 
     String ip,name,port;
+    int no_of_clients;
     /**
      * Creates new form GameOver
      */
-    public GameOver(List<String> leaderboard, String name, float wpm, float accuracy, String ip, String port) {
+    public GameOver(List<String> leaderboard, String name, float wpm, float accuracy, String ip, String port, int no_of_clients) {
         initComponents();
         this.ip=ip;
+        this.no_of_clients=no_of_clients;
         this.port=port;
         this.name=name;
         wpmLabel.setText("WPM: "+String.valueOf(String.format("%1$.2f",wpm)));
@@ -152,7 +154,7 @@ public class GameOver extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void RetryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RetryButtonActionPerformed
-        Game ob = new Game(name,ip,port);
+        Game ob = new Game(name,ip,port,no_of_clients);
         this.setVisible(false);
         ob.setVisible(true);
     }//GEN-LAST:event_RetryButtonActionPerformed

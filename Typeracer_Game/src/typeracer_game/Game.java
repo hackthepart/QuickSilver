@@ -49,15 +49,17 @@ public class Game extends javax.swing.JFrame {
     DefaultTableModel model;
     float wpm;
     float accuracy;
+    int no_of_clients;
     
     /**
      * Creates new form NewJFrame
      */
-    public Game(String name, String ip, String port) {
+    public Game(String name, String ip, String port, int no_of_clients) {
         initComponents();
         showPara();
         this.Ip=ip;
         this.port=port;
+        this.no_of_clients=no_of_clients;
         paraTextPane.setEditable(false);
         currentInputTF.requestFocus(true);
         words = new StringTokenizer(para);
@@ -87,7 +89,7 @@ public class Game extends javax.swing.JFrame {
     
     public void gameover(List<String> leaderborad, String name){
         
-        GameOver gameover = new GameOver(leaderborad,name,wpm,accuracy,Ip,port);
+        GameOver gameover = new GameOver(leaderborad,name,wpm,accuracy,Ip,port,no_of_clients);
         this.setVisible(false);
         gameover.setVisible(true);
         
